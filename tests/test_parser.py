@@ -1,8 +1,6 @@
-import antlr4
-from antlr4 import *
-from glslnodes import parser
-from glslnodes.glsl.GLSLParser import GLSLParser
-from glslnodes.glsl.GLSLParserListener import GLSLParserListener
+from scripts.addons.glslnodes import parser
+from scripts.addons.glslnodes.glsl.GLSLParser import GLSLParser
+from scripts.addons.glslnodes import GLSLParserListener
 
 
 # def test_enhanced0():

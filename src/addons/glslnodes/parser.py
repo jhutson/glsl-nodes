@@ -1,5 +1,5 @@
 import antlr4
-from . import ast
+from . import glsl_ast as ast
 from .glsl.GLSLLexer import GLSLLexer
 from .glsl.GLSLParser import GLSLParser
 from .glsl.GLSLParserVisitor import GLSLParserVisitor
@@ -34,9 +34,9 @@ class AstBuilder(GLSLParserVisitor):
             node = self.visitExternal_declaration(d)
             match node:
                 case ast.VariableDeclarationList():
-                    variables.extend(node.variable_list)
+                    variables.extend(node.variables)
 
-        print(f'{variables}')
+        # print(f'{variables}')
         variables_node = ast.VariableDeclarationList(variables)
         return ast.Script(variables_node)
 
@@ -107,7 +107,7 @@ class AstBuilder(GLSLParserVisitor):
         raise UnsupportedError("array specifier", ctx.getText())
 
 
-def load(file_path):
+def load(file_path) -> ast.Script:
     input = antlr4.FileStream(file_path)
     lexer = GLSLLexer(input)
     stream = antlr4.CommonTokenStream(lexer)
