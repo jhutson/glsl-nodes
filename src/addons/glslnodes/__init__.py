@@ -19,16 +19,17 @@ if module_path not in sys.path:
     sys.path.append(str(module_path))
 
 if "panels" not in locals():
-    from . import glsl_ast
+    from glsl_compiler import glsl_ast
+    from glsl_compiler import parser
     from . import operators
     from . import panels
-    from . import parser
 else:
     import importlib
     glsl_ast = importlib.reload(glsl_ast)
+    parser = importlib.reload(parser)
     operators = importlib.reload(operators)
     panels = importlib.reload(panels)
-    parser = importlib.reload(parser)
+
 
 
 def register():

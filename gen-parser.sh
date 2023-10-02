@@ -15,5 +15,5 @@ docker image inspect antlr/antlr4 > /dev/null 2>&1 || {
 docker run --rm -it -v ./grammars-v4/glsl:/work antlr/antlr4 -Dlanguage=Python3 -visitor GLSLLexer.g4 GLSLPreParser.g4 GLSLParser.g4 -o generated
 
 popd
-mkdir -p src/parser
-mv build/grammars-v4/glsl/generated/* ./src/glslnodes/glsl
+mkdir -p src/addons/glslnodes/modules/glsl_compiler/glsl
+mv build/grammars-v4/glsl/generated/* ./src/addons/glslnodes/modules/glsl_compiler/glsl

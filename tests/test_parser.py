@@ -1,6 +1,6 @@
-from scripts.addons.glslnodes import parser
-from scripts.addons.glslnodes.glsl.GLSLParser import GLSLParser
-from scripts.addons.glslnodes import GLSLParserListener
+from glsl_compiler import parser
+from glsl_compiler.glsl.GLSLParser import GLSLParser
+from glsl_compiler.glsl.GLSLParserListener import GLSLParserListener
 
 
 # def test_enhanced0():
@@ -19,7 +19,7 @@ def test_sinewave():
     root = parser.load("./tests/examples/sinewave.frag")
 
     assert(root is not None)
-    assert(len(root.variable_list.variable_list) == 6)
+    assert(len(root.variable_list.variables) == 6)
     # walker = ParseTreeWalker()
     # listener = FragmentListener()
     # walker.walk(listener, root)

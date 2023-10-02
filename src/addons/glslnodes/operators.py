@@ -1,7 +1,5 @@
 import bpy
-from . import glsl_ast as ast
-from . import parser
-# from bpy_extras.io_utils import ImportHelper
+from glsl_compiler import parser
 from bpy.types import Operator
 from bpy.props import StringProperty
 from pathlib import Path
@@ -36,11 +34,11 @@ class GLSLNODE_OT_CreateNodeGroup(Operator):
                 print(e)
                 self.report({"ERROR"}, f'Could not create node group from script')
                 return {'CANCELLED'}
-
             return {'FINISHED'}
         else:
             self.report({"ERROR"}, f'Path does not exist or is not a file: {file_path}')
             return {'CANCELLED'}
+
 
     def _create_node_group(self, context, group_name, glsl_node):
         bpy.context.scene.use_nodes = True
@@ -72,24 +70,6 @@ class GLSLNODE_OT_CreateNodeGroup(Operator):
                 return "NodeSocketFloat"
             case _:
                 raise ValueError(f'Unsupported mapping from {type_name} to node socket type')
-
-
-
-
-# class GLSLNODE_OT_OpenFileBrowser(Operator, ImportHelper):
-#     """Select Script File"""
-#     bl_idname = "glslnode.open_file_browser"
-#     bl_label = "Select GLSL script file"
-#
-#     filter_glob: StringProperty(
-#         default='*.frag',
-#         options={'HIDDEN'}
-#     )
-#
-#     def execute(self, context):
-#         context.object.active_material.glslnode_script_path = self.filepath
-#         # self.filepath
-#         return {'FINISHED'}
 
 
 def register():
