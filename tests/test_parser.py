@@ -1,4 +1,4 @@
-from glsl_compiler import parser
+from glsl_compiler import parser, visitor
 from glsl_compiler.glsl.GLSLParser import GLSLParser
 from glsl_compiler.glsl.GLSLParserListener import GLSLParserListener
 
@@ -19,6 +19,9 @@ def test_sinewave():
     root = parser.load("./tests/examples/sinewave.frag")
 
     assert(root is not None)
+
+    root.accept(visitor.Printer())
+
     assert(len(root.variable_list.variables) == 6)
     # walker = ParseTreeWalker()
     # listener = FragmentListener()

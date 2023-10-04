@@ -170,7 +170,7 @@ class ExpressionStatement(Statement):
 class FunctionDeclaration(Node):
     name: Identifier
     return_type: TypeDeclaration
-    parameters: list[VariableDeclaration]
+    parameters: list[VariableDeclaration] | None
     body: Statement
 
     def accept(self, visitor: 'GlslVisitor'):
@@ -199,12 +199,13 @@ class GlslVisitor(Node):
 
     def visit_type_declaration(self, node: TypeDeclaration):
         self.visit_type_specifier(node.specifier)
-        self.visit_type_qualifier(node.qualifier)
+        if node.qualifier:
+            self.visit_type_qualifier(node.qualifier)
 
     def visit_variable_declaration(self, node: VariableDeclaration):
         self.visit_identifier(node.identifier)
         self.visit_type_declaration(node.type)
-        if node.initializer is not None:
+        if node.initializer:
             node.initializer.accept(self)
 
     def visit_variable_declaration_list(self, node: VariableDeclarationList):
@@ -214,8 +215,9 @@ class GlslVisitor(Node):
     def visit_function_declaration(self, node: FunctionDeclaration):
         self.visit_identifier(node.name)
         self.visit_type_declaration(node.return_type)
-        for parameter in node.parameters:
-            parameter.accept(self)
+        if node.parameters:
+            for parameter in node.parameters:
+                parameter.accept(self)
         node.body.accept(self)
 
     def visit_identifier_expression(self, node: IdentifierExpression):
