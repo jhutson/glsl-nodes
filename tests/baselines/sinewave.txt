@@ -1,0 +1,65 @@
+
+Script:
+  VariableDeclarationList:
+    VariableDeclaration:
+      Identifier: PI
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: const
+      FloatExpression: 3.14159
+        TypeSpecifier: float
+    VariableDeclaration:
+      Identifier: t
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: in
+    VariableDeclaration:
+      Identifier: phase
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: in
+    VariableDeclaration:
+      Identifier: frequency
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: in
+    VariableDeclaration:
+      Identifier: amplitude
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: in
+    VariableDeclaration:
+      Identifier: value
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: out
+  FunctionDeclaration:
+    Identifier: main
+    TypeDeclaration:
+      TypeSpecifier: void
+    StatementList:
+      ExpressionStatement:
+        AssignmentExpression: =
+          IdentifierExpression:
+            Identifier: value
+          BinaryOpExpression: *
+            IdentifierExpression:
+              Identifier: amplitude
+            CallExpression:
+              IdentifierExpression:
+                Identifier: sin
+              ExpressionList:
+                BinaryOpExpression: /
+                  BinaryOpExpression: *
+                    BinaryOpExpression: *
+                      BinaryOpExpression: +
+                        IdentifierExpression:
+                          Identifier: t
+                        IdentifierExpression:
+                          Identifier: phase
+                      IntegerExpression: 2
+                        TypeSpecifier: int
+                    IdentifierExpression:
+                      Identifier: PI
+                  IdentifierExpression:
+                    Identifier: frequency

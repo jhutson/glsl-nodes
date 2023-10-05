@@ -1,0 +1,26 @@
+
+Script:
+  VariableDeclarationList:
+    VariableDeclaration:
+      Identifier: PI
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: const
+      FloatExpression: 3.14159
+        TypeSpecifier: float
+    VariableDeclaration:
+      Identifier: value
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: out
+  FunctionDeclaration:
+    Identifier: main
+    TypeDeclaration:
+      TypeSpecifier: void
+    StatementList:
+      ExpressionStatement:
+        AssignmentExpression: =
+          IdentifierExpression:
+            Identifier: value
+          IdentifierExpression:
+            Identifier: PI
