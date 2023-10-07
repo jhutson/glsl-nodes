@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 
 class Node:
@@ -14,7 +14,7 @@ class Expression(Node):
 
 @dataclass
 class ExpressionList(Node):
-    expressions: list[Expression]
+    expressions: List[Expression]
 
     def accept(self, visitor: 'GlslVisitor'):
         return visitor.visit_expression_list(self)
@@ -68,7 +68,7 @@ class AssignmentExpression(Expression):
 @dataclass
 class CallExpression(Expression):
     name: IdentifierExpression
-    parameters: ExpressionList | None
+    parameters: Optional[ExpressionList]
 
     def accept(self, visitor: 'GlslVisitor'):
         return visitor.visit_call_expression(self)
@@ -93,7 +93,7 @@ class TypeQualifier(Node):
 @dataclass
 class TypeDeclaration(Node):
     specifier: TypeSpecifier
-    qualifier: TypeQualifier | None
+    qualifier: Optional[TypeQualifier]
 
     def accept(self, visitor: 'GlslVisitor'):
         return visitor.visit_type_declaration(self)
@@ -103,7 +103,7 @@ class TypeDeclaration(Node):
 class VariableDeclaration(Node):
     identifier: Identifier
     type: TypeDeclaration
-    initializer: Expression | None
+    initializer: Optional[Expression]
 
     def accept(self, visitor: 'GlslVisitor'):
         return visitor.visit_variable_declaration(self)
@@ -152,7 +152,7 @@ class Statement(Node):
 
 @dataclass
 class StatementList(Statement):
-    statements: list[Statement]
+    statements: List[Statement]
 
     def accept(self, visitor: 'GlslVisitor'):
         return visitor.visit_statement_list(self)
@@ -170,7 +170,7 @@ class ExpressionStatement(Statement):
 class FunctionDeclaration(Node):
     name: Identifier
     return_type: TypeDeclaration
-    parameters: list[VariableDeclaration] | None
+    parameters: Optional[List[VariableDeclaration]]
     body: Statement
 
     def accept(self, visitor: 'GlslVisitor'):
@@ -180,7 +180,7 @@ class FunctionDeclaration(Node):
 @dataclass
 class Script(Node):
     variable_list: VariableDeclarationList
-    functions: list[FunctionDeclaration]
+    functions: List[FunctionDeclaration]
 
     def accept(self, visitor: 'GlslVisitor'):
         return visitor.visit_script(self)

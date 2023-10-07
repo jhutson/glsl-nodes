@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import List
 
 from . import parser
 from . import glsl_ast as ast
@@ -36,8 +37,8 @@ class GroupNodeSocket:
 
 @dataclass(eq=False)
 class GroupNodePlan:
-    inputs: list[GroupNodeSocket]
-    outputs: list[GroupNodeSocket]
+    inputs: List[GroupNodeSocket]
+    outputs: List[GroupNodeSocket]
 
 
 def create_group_node_plan(file_path):

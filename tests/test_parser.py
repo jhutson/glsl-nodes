@@ -1,9 +1,11 @@
+import typing
+from collections import deque
 from dataclasses import dataclass
 
 import pytest
 from pathlib import Path
 
-from glsl_compiler import parser, visitor
+from glsl_compiler import parser, visitor, graph
 
 
 def _script_folder():
@@ -71,3 +73,39 @@ def test_parser_with_script(script_file, get_files_for_test_case, capfd):
 
     assert actual.read_text() == baseline.read_text(), \
         f"actual {actual} differs from baseline {baseline}"
+
+def test_graph_build(script_folder):
+    root = parser.load(str(script_folder / "graph_build.frag"))
+    assert (root is not None)
+
+    v = visitor.GraphBuilder()
+    root.accept(v)
+
+    g = v.node_graph
+
+    index_by_node = {n: i for i, n in enumerate(g.nodes)}
+    # Simulate creating actual nodes
+    node_labels = [f"{type(n).__name__}{i}" for i, n in enumerate(g.nodes)]
+
+    queue: typing.Deque[graph.Node] = deque()
+    queue.append(g.get_group_output())
+    visited: typing.Set[int] = set()
+
+    print('Graph Links:')
+    while len(queue) > 0:
+        node = queue.pop()
+        node_index = index_by_node[node]
+        to_label = node_labels[node_index]
+        visited.add(node_index)
+
+        for input_ref in (graph.SocketRef(i,node) for i,_ in enumerate(node.inputs)):
+            input_index = input_ref.socket_index
+            for output_ref in g.links.get(input_ref,[]):
+                other_index = index_by_node[output_ref.node]
+                from_label = node_labels[other_index]
+                print(f'link {from_label}.outputs[{output_ref.socket_index}] to {to_label}.inputs[{input_index}]')
+
+                if other_index not in visited:
+                    queue.append(output_ref.node)
+
+
