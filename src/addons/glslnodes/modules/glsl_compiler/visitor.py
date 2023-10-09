@@ -193,18 +193,18 @@ class GraphBuilder(GlslVisitor):
 
     def visit_script(self, node: Script):
         self._environment = [SymbolTable()]
-        self.node_graph = graph.NodeGraph(graph.Node([], []), graph.Node([], []))
+        self.node_graph = graph.NodeGraph()
 
         super().visit_script(node)
 
         # Link group outputs based on bindings.
         top = self._current_scope()
         group_output = self.node_graph.get_group_output()
-        outputs_by_name = {s.name: i for i,s in enumerate(group_output.inputs)}
+        outputs_by_name = {s.name: i for i, s in enumerate(group_output.inputs)}
         for name in top.bindings:
             socket_ref, immutable = top.bindings[name]
             if not immutable and socket_ref.node != group_output:
-                to_socket = graph.SocketRef(outputs_by_name[name], group_output, )
+                to_socket = graph.SocketRef(outputs_by_name[name], group_output)
                 self.node_graph.links[to_socket].append(socket_ref)
 
     def visit_identifier(self, node: Identifier):
@@ -256,14 +256,12 @@ class GraphBuilder(GlslVisitor):
         return self._current_scope().get_binding(node.identifier)
 
     def visit_integer_expression(self, node: IntegerExpression):
-        socket = graph.Socket("value", _get_socket_type(node))
-        value_node = graph.ValueNode(node.value, socket)
+        value_node = graph.ValueNode(node.value)
         self.node_graph.nodes.append(value_node)
         return graph.SocketRef(0, value_node)
 
     def visit_float_expression(self, node: FloatExpression):
-        socket = graph.Socket("value", _get_socket_type(node))
-        value_node = graph.ValueNode(node.value, socket)
+        value_node = graph.ValueNode(node.value)
         self.node_graph.nodes.append(value_node)
         return graph.SocketRef(0, value_node)
 
@@ -280,13 +278,7 @@ class GraphBuilder(GlslVisitor):
         left_socket = node.left.accept(self)
         right_socket = node.right.accept(self)
 
-        input_sockets = [
-            graph.Socket("value", left_socket.get_output_type()),
-            graph.Socket("value", right_socket.get_output_type())
-        ]
-        output_socket = graph.Socket("value", input_sockets[0].socket_type)
-        math_node = graph.MathNode(node.operator, input_sockets, output_socket)
-
+        math_node = graph.MathNode(node.operator)
         self.node_graph.nodes.append(math_node)
         self.node_graph.links[graph.SocketRef(0, math_node)].append(left_socket)
         self.node_graph.links[graph.SocketRef(1, math_node)].append(right_socket)
@@ -301,7 +293,6 @@ class GraphBuilder(GlslVisitor):
         self._current_scope().set_binding(node.left.identifier, right_socket)
 
         return right_socket
-
 
     def visit_call_expression(self, node: CallExpression):
         super().visit_call_expression(node)

@@ -1,6 +1,7 @@
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List
+
 
 @dataclass
 class GraphError:
@@ -15,39 +16,47 @@ class Socket:
 
 @dataclass(eq=False)
 class Node:
-    inputs: List[Socket]
-    outputs: List[Socket]
+
+    def input_count(self):
+        pass
+
+
+@dataclass(eq=False)
+class GroupNode(Node):
+    inputs: List[Socket] = field(default_factory=list)
+    outputs: List[Socket] = field(default_factory=list)
+
+    def input_count(self):
+        return len(self.inputs)
+
 
 
 @dataclass(eq=False, init=False)
 class ValueNode(Node):
     value: float | int | bool
 
-    def __init__(self, value: float | int | bool, socket: Socket):
-        super().__init__([], [socket])
+    def __init__(self, value: float | int | bool):
         self.value = value
+
+    def input_count(self):
+        return 1
 
 
 @dataclass(eq=False, init=False)
 class MathNode(Node):
     operator: str
 
-    def __init__(self, operator: str, inputs: List[Socket], output: Socket):
-        super().__init__(inputs, [output])
+    def __init__(self, operator: str):
         self.operator = operator
+
+    def input_count(self):
+        return 2
 
 
 @dataclass(frozen=True)
 class SocketRef:
     socket_index: int
     node: Node
-
-    def get_output_type(self):
-        """Return socket type of node output socket at index referenced by this object.
-
-        This should only be used when this object actually represents an output socket.
-        """
-        return self.node.outputs[self.socket_index].socket_type
 
 
 class NodeGraph:
@@ -59,14 +68,14 @@ class NodeGraph:
     Given a node X, this can be used to find the nodes connected to its inputs.
     '''
 
-    def __init__(self, group_input: Node, group_output: Node):
+    def __init__(self):
         self.nodes = []
         self.links = defaultdict(list)
-        self.nodes.append(group_output)
-        self.nodes.append(group_input)
+        self.nodes.append(GroupNode())
+        self.nodes.append(GroupNode())
 
     def get_group_input(self):
-        return self.nodes[1]
+        return self.nodes[0]
 
     def get_group_output(self):
-        return self.nodes[0]
+        return self.nodes[1]

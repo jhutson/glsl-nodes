@@ -58,15 +58,15 @@ class GLSLNODE_OT_CreateNodeGroup(Operator):
             index_by_node[node] = index
             match index:
                 case 0:
-                    group_output = group.nodes.new("NodeGroupOutput")
-                    for output_socket in node.inputs:
-                        group.outputs.new(output_socket.socket_type, output_socket.name)
-                    real_nodes.append(group_output)
-                case 1:
                     group_input = group.nodes.new("NodeGroupInput")
                     for output_socket in node.outputs:
                         group.inputs.new(output_socket.socket_type, output_socket.name)
                     real_nodes.append(group_input)
+                case 1:
+                    group_output = group.nodes.new("NodeGroupOutput")
+                    for output_socket in node.inputs:
+                        group.outputs.new(output_socket.socket_type, output_socket.name)
+                    real_nodes.append(group_output)
                 case _:
                     match node:
                         case graph.ValueNode():

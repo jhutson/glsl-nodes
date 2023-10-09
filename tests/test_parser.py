@@ -99,7 +99,7 @@ def test_graph_build(script_folder):
         to_label = node_labels[node_index]
         visited.add(node_index)
 
-        for input_ref in (graph.SocketRef(i, node) for i, _ in enumerate(node.inputs)):
+        for input_ref in (graph.SocketRef(i, node) for i in range(0, node.input_count())):
             input_index = input_ref.socket_index
             for output_ref in g.links.get(input_ref, []):
                 other_index = index_by_node[output_ref.node]
