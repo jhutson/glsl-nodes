@@ -1,0 +1,24 @@
+
+Script:
+  VariableDeclarationList:
+    VariableDeclaration:
+      Identifier: a
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: in
+    VariableDeclaration:
+      Identifier: b
+      TypeDeclaration:
+        TypeSpecifier: float
+        TypeQualifier: out
+  FunctionDeclaration:
+    Identifier: main
+    TypeDeclaration:
+      TypeSpecifier: void
+    StatementList:
+      ExpressionStatement:
+        AssignmentExpression: =
+          IdentifierExpression:
+            Identifier: b
+          IdentifierExpression:
+            Identifier: a

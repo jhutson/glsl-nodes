@@ -74,8 +74,9 @@ def test_parser_with_script(script_file, get_files_for_test_case, capfd):
     assert actual.read_text() == baseline.read_text(), \
         f"actual {actual} differs from baseline {baseline}"
 
+
 def test_graph_build(script_folder):
-    root = parser.load(str(script_folder / "graph_build.frag"))
+    root = parser.load(str(script_folder / "bin_ops_only.frag"))
     assert (root is not None)
 
     v = visitor.GraphBuilder()
@@ -98,14 +99,12 @@ def test_graph_build(script_folder):
         to_label = node_labels[node_index]
         visited.add(node_index)
 
-        for input_ref in (graph.SocketRef(i,node) for i,_ in enumerate(node.inputs)):
+        for input_ref in (graph.SocketRef(i, node) for i, _ in enumerate(node.inputs)):
             input_index = input_ref.socket_index
-            for output_ref in g.links.get(input_ref,[]):
+            for output_ref in g.links.get(input_ref, []):
                 other_index = index_by_node[output_ref.node]
                 from_label = node_labels[other_index]
                 print(f'link {from_label}.outputs[{output_ref.socket_index}] to {to_label}.inputs[{input_index}]')
 
                 if other_index not in visited:
                     queue.append(output_ref.node)
-
-

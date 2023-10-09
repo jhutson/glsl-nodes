@@ -1,6 +1,10 @@
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List
+
+@dataclass
+class GraphError:
+    message: str
 
 
 @dataclass
@@ -44,6 +48,7 @@ class SocketRef:
         This should only be used when this object actually represents an output socket.
         """
         return self.node.outputs[self.socket_index].socket_type
+
 
 class NodeGraph:
     nodes: List[Node]

@@ -1,8 +1,15 @@
 import bpy
-from glsl_compiler import planner
+from glsl_compiler import graph, builder
 from bpy.types import Operator
 from bpy.props import StringProperty
 from pathlib import Path
+
+math_operation_from_symbol = {
+    '+': 'ADD',
+    '-': 'SUBTRACT',
+    '*': 'MULTIPLY',
+    '/': 'DIVIDE'
+}
 
 
 class GLSLNODE_OT_CreateNodeGroup(Operator):
@@ -23,12 +30,12 @@ class GLSLNODE_OT_CreateNodeGroup(Operator):
         file_path = file_path.resolve()
 
         if file_path.exists() and file_path.is_file():
-            result = planner.create_group_node_plan(file_path)
+            result = builder.create_group_node_graph(file_path)
             match result:
-                case planner.PlanError():
+                case graph.GraphError():
                     self.report({"ERROR"}, result.message)
                     return {'CANCELLED'}
-                case planner.GroupNodePlan():
+                case graph.NodeGraph():
                     group = self._create_node_group(context, file_path.stem, result)
                     # SHADER_SPECIFIC: active_material and ShaderNodeGroup
                     group_node = context.object.active_material.node_tree.nodes.new('ShaderNodeGroup')
@@ -38,20 +45,56 @@ class GLSLNODE_OT_CreateNodeGroup(Operator):
             self.report({"ERROR"}, f'Path does not exist or is not a file: {file_path}')
             return {'CANCELLED'}
 
-    def _create_node_group(self, context, group_name, group_plan):
+    def _create_node_group(self, context, group_name, node_graph):
         bpy.context.scene.use_nodes = True
 
         # SHADER_SPECIFIC: ShaderNodeTree
         group = bpy.data.node_groups.new(group_name, 'ShaderNodeTree')
 
-        group_input = group.nodes.new("NodeGroupInput")
-        group_output = group.nodes.new("NodeGroupOutput")
+        index_by_node = {}
+        real_nodes = []
 
-        for input_socket in group_plan.inputs:
-            group.inputs.new(input_socket.socket_type, input_socket.name)
+        for index, node in enumerate(node_graph.nodes):
+            index_by_node[node] = index
+            match index:
+                case 0:
+                    group_output = group.nodes.new("NodeGroupOutput")
+                    for output_socket in node.inputs:
+                        group.outputs.new(output_socket.socket_type, output_socket.name)
+                    real_nodes.append(group_output)
+                case 1:
+                    group_input = group.nodes.new("NodeGroupInput")
+                    for output_socket in node.outputs:
+                        group.inputs.new(output_socket.socket_type, output_socket.name)
+                    real_nodes.append(group_input)
+                case _:
+                    match node:
+                        case graph.ValueNode():
+                            # SHADER_SPECIFIC: ShaderNodeValue
+                            value_node = group.nodes.new("ShaderNodeValue")
+                            value_node.outputs[0].default_value = node.value
+                            real_nodes.append(value_node)
+                        case graph.MathNode():
+                            # SHADER_SPECIFIC: ShaderNodeMath
+                            math_node = group.nodes.new("ShaderNodeMath")
+                            math_node.operation = math_operation_from_symbol[node.operator]
+                            real_nodes.append(math_node)
 
-        for output_socket in group_plan.outputs:
-            group.outputs.new(output_socket.socket_type, output_socket.name)
+        for input_ref in node_graph.links:
+            in_index = index_by_node[input_ref.node]
+            in_node = real_nodes[in_index]
+
+            for output_ref in node_graph.links[input_ref]:
+                out_index = index_by_node[output_ref.node]
+                out_node = real_nodes[out_index]
+
+                # # debugging
+                # from_label = f"{type(output_ref.node).__name__}{out_index}"
+                # to_label = f"{type(input_ref.node).__name__}{in_index}"
+                # self.report({'INFO'},
+                #             f'link {from_label}.outputs[{output_ref.socket_index}] to {to_label}.inputs[{input_ref.socket_index}]')
+
+                group.links.new(in_node.inputs[input_ref.socket_index], out_node.outputs[output_ref.socket_index])
 
         return group
 

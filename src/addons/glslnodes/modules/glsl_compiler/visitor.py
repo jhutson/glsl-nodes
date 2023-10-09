@@ -164,11 +164,11 @@ def _get_socket_type(node: VariableDeclaration | ConstantExpression):
     variable_name = ""
 
     match node:
-        case VariableDeclaration():
-            type_name = node.type.specifier.name
+        case VariableDeclaration(type=TypeDeclaration(specifier=TypeSpecifier(name))):
+            type_name = name
             variable_name = node.identifier.name
-        case ConstantExpression():
-            type_name = node.type.name
+        case ConstantExpression(type=TypeSpecifier(name)):
+            type_name = name
         case _:
             raise ValueError(f"Unexpected node type {type(node)}")
 
@@ -289,7 +289,7 @@ class GraphBuilder(GlslVisitor):
 
         self.node_graph.nodes.append(math_node)
         self.node_graph.links[graph.SocketRef(0, math_node)].append(left_socket)
-        self.node_graph.links[graph.SocketRef(0, math_node)].append(right_socket)
+        self.node_graph.links[graph.SocketRef(1, math_node)].append(right_socket)
 
         return graph.SocketRef(0, math_node)
 
