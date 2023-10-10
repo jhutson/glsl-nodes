@@ -30,27 +30,21 @@ class GroupNode(Node):
         return len(self.inputs)
 
 
-
-@dataclass(eq=False, init=False)
+@dataclass(eq=False)
 class ValueNode(Node):
     value: float | int | bool
-
-    def __init__(self, value: float | int | bool):
-        self.value = value
 
     def input_count(self):
         return 1
 
 
-@dataclass(eq=False, init=False)
+@dataclass(eq=False)
 class MathNode(Node):
-    operator: str
-
-    def __init__(self, operator: str):
-        self.operator = operator
+    operation: str
+    _input_count: int
 
     def input_count(self):
-        return 2
+        return self._input_count
 
 
 @dataclass(frozen=True)

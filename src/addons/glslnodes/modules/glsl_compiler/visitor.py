@@ -117,6 +117,28 @@ class Printer(GlslVisitor):
             super().visit_script(node)
 
 
+_math_operation_from_symbol = {
+    '+': 'ADD',
+    '-': 'SUBTRACT',
+    '*': 'MULTIPLY',
+    '/': 'DIVIDE'
+}
+
+_builtin_functions = {
+    'sin': 'SINE',
+    'cos': 'COSINE',
+    'tan': 'TANGENT',
+    'radians': 'RADIANS',
+    'degrees': 'DEGREES',
+    'asin': 'ARCSINE',
+    'acos': 'ARCCOSINE',
+    'atan': ['ARCTANGENT', 'ARCTAN2'],  # For one and two parameters, respectively.
+    'sinh': 'SINH',
+    'cosh': 'COSH',
+    'tanh': 'TANH'
+}
+
+
 class SymbolTable:
     declarations: Dict[str, VariableDeclaration]
     bindings: Dict[str, Tuple[graph.SocketRef, bool]]
@@ -275,10 +297,14 @@ class GraphBuilder(GlslVisitor):
         super().visit_unary_op_expression(node)
 
     def visit_binary_op_expression(self, node: BinaryOpExpression):
+        operation = _math_operation_from_symbol.get(node.operator)
+        if operation is None:
+            raise ValueError(f"Operator not supported: '{node.operator}'")
+
         left_socket = node.left.accept(self)
         right_socket = node.right.accept(self)
 
-        math_node = graph.MathNode(node.operator)
+        math_node = graph.MathNode(operation, 2)
         self.node_graph.nodes.append(math_node)
         self.node_graph.links[graph.SocketRef(0, math_node)].append(left_socket)
         self.node_graph.links[graph.SocketRef(1, math_node)].append(right_socket)
@@ -295,7 +321,40 @@ class GraphBuilder(GlslVisitor):
         return right_socket
 
     def visit_call_expression(self, node: CallExpression):
-        super().visit_call_expression(node)
+        function_name = node.name.identifier.name
+        builtin = _builtin_functions.get(function_name)
+        if builtin is None:
+            raise ValueError(f"Function not defined: '{function_name}'")
+
+        if not node.parameters or len(node.parameters.expressions) == 0:
+            raise ValueError(
+                f"Function '{function_name}' expects one or more parameters, but none were supplied.")
+
+        supplied_parameter_count = len(node.parameters.expressions)
+
+        operation: str
+        match builtin:
+            case list():
+                if supplied_parameter_count > len(builtin):
+                    raise ValueError(
+                        f"Function '{function_name}' expects 1 to {len(builtin)} parameters, but {supplied_parameter_count} were supplied.")
+
+                operation = builtin[supplied_parameter_count - 1]
+            case _:
+                if supplied_parameter_count > 1:
+                    raise ValueError(
+                        f"Function '{function_name}' expects one parameter, but {supplied_parameter_count} were supplied.")
+
+                operation = builtin
+
+        math_node = graph.MathNode(operation, supplied_parameter_count)
+        self.node_graph.nodes.append(math_node)
+
+        for index, expression in enumerate(node.parameters.expressions):
+            socket_ref = expression.accept(self)
+            self.node_graph.links[graph.SocketRef(index, math_node)].append(socket_ref)
+
+        return graph.SocketRef(0, math_node)
 
     def visit_statement_list(self, node: StatementList):
         super().visit_statement_list(node)

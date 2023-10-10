@@ -75,8 +75,9 @@ def test_parser_with_script(script_file, get_files_for_test_case, capfd):
         f"actual {actual} differs from baseline {baseline}"
 
 
-def test_graph_build(script_folder):
-    root = parser.load(str(script_folder / "bin_ops_only.frag"))
+@pytest.mark.parametrize('script_file', ['bin_ops_only.frag', 'sinewave.frag'])
+def test_graph_build(script_file, script_folder):
+    root = parser.load(str(script_folder / script_file))
     assert (root is not None)
 
     v = visitor.GraphBuilder()

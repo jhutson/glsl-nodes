@@ -4,14 +4,6 @@ from bpy.types import Operator
 from bpy.props import StringProperty
 from pathlib import Path
 
-math_operation_from_symbol = {
-    '+': 'ADD',
-    '-': 'SUBTRACT',
-    '*': 'MULTIPLY',
-    '/': 'DIVIDE'
-}
-
-
 class GLSLNODE_OT_CreateNodeGroup(Operator):
     """Create Node Group from Script File"""
     bl_idname = "glslnode.create_node_group"
@@ -77,7 +69,7 @@ class GLSLNODE_OT_CreateNodeGroup(Operator):
                         case graph.MathNode():
                             # SHADER_SPECIFIC: ShaderNodeMath
                             math_node = group.nodes.new("ShaderNodeMath")
-                            math_node.operation = math_operation_from_symbol[node.operator]
+                            math_node.operation = node.operation
                             real_nodes.append(math_node)
 
         for input_ref in node_graph.links:
