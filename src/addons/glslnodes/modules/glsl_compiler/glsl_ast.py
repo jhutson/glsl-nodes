@@ -165,6 +165,13 @@ class ExpressionStatement(Statement):
     def accept(self, visitor: 'GlslVisitor'):
         return visitor.visit_expression_statement(self)
 
+@dataclass
+class DeclarationStatement(Statement):
+    declaration: VariableDeclarationList
+
+    def accept(self, visitor: 'GlslVisitor'):
+        return visitor.visit_declaration_statement(self)
+
 
 @dataclass
 class FunctionDeclaration(Node):
@@ -258,6 +265,9 @@ class GlslVisitor(Node):
 
     def visit_expression_statement(self, node: ExpressionStatement):
         node.expression.accept(self)
+
+    def visit_declaration_statement(self, node: DeclarationStatement):
+        node.declaration.accept(self)
 
     def visit_script(self, node: Script):
         self.visit_variable_declaration_list(node.variable_list)

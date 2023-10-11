@@ -33,29 +33,30 @@ Script:
     TypeDeclaration:
       TypeSpecifier: void
     StatementList:
-      VariableDeclarationList:
-        VariableDeclaration:
-          Identifier: value
-          TypeDeclaration:
-            TypeSpecifier: float
-          BinaryOpExpression: *
-            IdentifierExpression:
-              Identifier: amplitude
-            CallExpression:
+      DeclarationStatement:
+        VariableDeclarationList:
+          VariableDeclaration:
+            Identifier: value
+            TypeDeclaration:
+              TypeSpecifier: float
+            BinaryOpExpression: *
               IdentifierExpression:
-                Identifier: sin
-              ExpressionList:
-                BinaryOpExpression: /
-                  BinaryOpExpression: *
+                Identifier: amplitude
+              CallExpression:
+                IdentifierExpression:
+                  Identifier: sin
+                ExpressionList:
+                  BinaryOpExpression: /
                     BinaryOpExpression: *
-                      BinaryOpExpression: +
-                        IdentifierExpression:
-                          Identifier: t
-                        IdentifierExpression:
-                          Identifier: phase
-                      IntegerExpression: 2
-                        TypeSpecifier: int
+                      BinaryOpExpression: *
+                        BinaryOpExpression: +
+                          IdentifierExpression:
+                            Identifier: t
+                          IdentifierExpression:
+                            Identifier: phase
+                        IntegerExpression: 2
+                          TypeSpecifier: int
+                      IdentifierExpression:
+                        Identifier: PI
                     IdentifierExpression:
-                      Identifier: PI
-                  IdentifierExpression:
-                    Identifier: frequency
+                      Identifier: frequency

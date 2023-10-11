@@ -1,0 +1,16 @@
+All Nodes:
+GroupInput-0
+GroupOutput-1
+ValueNode(int 2)-2
+MathNode(MULTIPLY)-3
+
+All Links:
+link ValueNode(int 2)-2.outputs[0] to MathNode(MULTIPLY)-3.inputs[0]
+link GroupInput-0.outputs[NodeSocketFloat x] to MathNode(MULTIPLY)-3.inputs[1]
+link MathNode(MULTIPLY)-3.outputs[0] to GroupOutput-1.inputs[NodeSocketFloat value]
+
+Graph Links Reachable from Group Output:
+link MathNode(MULTIPLY)-3.outputs[0] to GroupOutput-1.inputs[NodeSocketFloat value]
+link ValueNode(int 2)-2.outputs[0] to MathNode(MULTIPLY)-3.inputs[0]
+link GroupInput-0.outputs[NodeSocketFloat x] to MathNode(MULTIPLY)-3.inputs[1]
+-END-

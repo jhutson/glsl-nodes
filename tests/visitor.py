@@ -107,6 +107,11 @@ class Printer(GlslVisitor):
         with self.do_indent():
             super().visit_expression_statement(node)
 
+    def visit_declaration_statement(self, node: DeclarationStatement):
+        self.print(f"{_name(node)}:")
+        with self.do_indent():
+            super().visit_declaration_statement(node)
+
     def visit_script(self, node: Script):
         self.print("")
         self.print(f"{_name(node)}:")

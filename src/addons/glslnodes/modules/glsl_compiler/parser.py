@@ -253,6 +253,13 @@ class AstBuilder(GLSLParserVisitor):
         if expression_node:
             return ast.ExpressionStatement(expression_node)
 
+    def visitDeclaration_statement(self, ctx:GLSLParser.Declaration_statementContext):
+        declaration = self.visitChildren(ctx)
+        if declaration is None:
+            raise UnsupportedError("declaration statement", ctx.getText())
+
+        return ast.DeclarationStatement(declaration)
+
 
 def load(file_path) -> ast.Script:
     input = antlr4.FileStream(file_path)
