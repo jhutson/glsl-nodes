@@ -1,2 +1,11 @@
+All Nodes:
+GroupOutput-0
+GroupOutput-1
+ValueNode(float 3.14159)-2
+
+All Links:
+link ValueNode(float 3.14159)-2.outputs[0] to GroupOutput-1.inputs[NodeSocketFloat value]
+
 Graph Links Reachable from Group Output:
 link ValueNode(float 3.14159)-2.outputs[0] to GroupOutput-1.inputs[NodeSocketFloat value]
+-END-

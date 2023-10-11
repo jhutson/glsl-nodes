@@ -158,7 +158,10 @@ class GraphBuilder(GlslVisitor):
         super().visit_variable_declaration_list(node)
 
     def visit_function_declaration(self, node: FunctionDeclaration):
+        function_scope = SymbolTable(self._current_scope())
+        self._environment.append(function_scope)
         super().visit_function_declaration(node)
+        self._environment.pop()
 
     def visit_identifier_expression(self, node: IdentifierExpression):
         return self._current_scope().get_binding(node.identifier)

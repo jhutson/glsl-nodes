@@ -80,12 +80,6 @@ class GLSLNODE_OT_CreateNodeGroup(Operator):
                 out_index = index_by_node[output_ref.node]
                 out_node = real_nodes[out_index]
 
-                # # debugging
-                # from_label = f"{type(output_ref.node).__name__}{out_index}"
-                # to_label = f"{type(input_ref.node).__name__}{in_index}"
-                # self.report({'INFO'},
-                #             f'link {from_label}.outputs[{output_ref.socket_index}] to {to_label}.inputs[{input_ref.socket_index}]')
-
                 group.links.new(in_node.inputs[input_ref.socket_index], out_node.outputs[output_ref.socket_index])
 
         return group

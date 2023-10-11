@@ -88,17 +88,6 @@ def test_parser_with_script(script_file, get_files_for_test_case, capfd):
 
 @pytest.mark.parametrize('script_file', get_script_files())
 def test_graph_build(script_file, script_folder, get_files_for_test_case, capfd):
-    files = get_files_for_test_case(script_file)
-    g = builder.create_group_node_graph(files.script_file)
-
-    index_by_node = {n: i for i, n in enumerate(g.nodes)}
-    # Simulate creating actual nodes
-    node_labels = [f"{str(n)}-{i}" for i, n in enumerate(g.nodes)]
-
-    queue: typing.Deque[graph.Node] = deque()
-    queue.append(g.get_group_output())
-    visited: typing.Set[int] = set()
-
     def socket_label(socket_ref: graph.SocketRef, is_input: bool):
         match socket_ref:
             case graph.SocketRef(i, graph.GroupNode() as group_node):
@@ -109,21 +98,52 @@ def test_graph_build(script_file, script_folder, get_files_for_test_case, capfd)
             case _:
                 return socket_ref.socket_index
 
-    print('Graph Links Reachable from Group Output:')
-    while len(queue) > 0:
-        node = queue.pop()
-        node_index = index_by_node[node]
-        to_label = node_labels[node_index]
-        visited.add(node_index)
+    files = get_files_for_test_case(script_file)
+    g = builder.create_group_node_graph(files.script_file)
 
-        for input_ref in (graph.SocketRef(i, node) for i in range(0, node.input_count())):
-            to_socket_label = f"{to_label}.inputs[{socket_label(input_ref, True)}]"
-            for output_ref in g.links.get(input_ref, []):
-                other_index = index_by_node[output_ref.node]
-                from_label = node_labels[other_index]
-                print(f'link {from_label}.outputs[{socket_label(output_ref, False)}] to {to_socket_label}')
+    match g:
+        case graph.GraphError(message):
+            print(f"GraphError: {message}")
+        case _:
+            index_by_node = {n: i for i, n in enumerate(g.nodes)}
+            # Simulate creating actual nodes
+            node_labels = [f"{str(n)}-{i}" for i, n in enumerate(g.nodes)]
 
-                if other_index not in visited:
-                    queue.append(output_ref.node)
+            print('All Nodes:')
+            for label in node_labels:
+                print(label)
+
+            print('\nAll Links:')
+            for input_ref in g.links:
+                in_index = index_by_node[input_ref.node]
+                to_label = node_labels[in_index]
+                to_socket_label = f"{to_label}.inputs[{socket_label(input_ref, True)}]"
+
+                for output_ref in g.links[input_ref]:
+                    out_index = index_by_node[output_ref.node]
+                    from_label = node_labels[out_index]
+                    print(f'link {from_label}.outputs[{socket_label(output_ref, False)}] to {to_socket_label}')
+
+            queue: typing.Deque[graph.Node] = deque()
+            queue.append(g.get_group_output())
+            visited: typing.Set[int] = set()
+
+            print('\nGraph Links Reachable from Group Output:')
+            while len(queue) > 0:
+                node = queue.pop()
+                node_index = index_by_node[node]
+                to_label = node_labels[node_index]
+                visited.add(node_index)
+
+                for input_ref in (graph.SocketRef(i, node) for i in range(0, node.input_count())):
+                    to_socket_label = f"{to_label}.inputs[{socket_label(input_ref, True)}]"
+                    for output_ref in g.links.get(input_ref, []):
+                        other_index = index_by_node[output_ref.node]
+                        from_label = node_labels[other_index]
+                        print(f'link {from_label}.outputs[{socket_label(output_ref, False)}] to {to_socket_label}')
+
+                        if other_index not in visited:
+                            queue.append(output_ref.node)
+            print("-END-")
 
     _compare_actual_to_baseline(files, capfd)

@@ -1,2 +1,10 @@
+All Nodes:
+GroupInput-0
+GroupOutput-1
+
+All Links:
+link GroupInput-0.outputs[NodeSocketFloat a] to GroupOutput-1.inputs[NodeSocketFloat b]
+
 Graph Links Reachable from Group Output:
 link GroupInput-0.outputs[NodeSocketFloat a] to GroupOutput-1.inputs[NodeSocketFloat b]
+-END-
