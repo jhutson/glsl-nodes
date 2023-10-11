@@ -1,0 +1,2 @@
+Graph Links Reachable from Group Output:
+link GroupInput-0.outputs[NodeSocketFloat a] to GroupOutput-1.inputs[NodeSocketFloat b]

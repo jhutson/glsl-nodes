@@ -1,0 +1,13 @@
+Graph Links Reachable from Group Output:
+link MathNode(MULTIPLY)-9.outputs[0] to GroupOutput-1.inputs[NodeSocketFloat value]
+link GroupInput-0.outputs[NodeSocketFloat amplitude] to MathNode(MULTIPLY)-9.inputs[0]
+link MathNode(SINE)-3.outputs[0] to MathNode(MULTIPLY)-9.inputs[1]
+link MathNode(DIVIDE)-8.outputs[0] to MathNode(SINE)-3.inputs[0]
+link MathNode(MULTIPLY)-7.outputs[0] to MathNode(DIVIDE)-8.inputs[0]
+link GroupInput-0.outputs[NodeSocketFloat frequency] to MathNode(DIVIDE)-8.inputs[1]
+link MathNode(MULTIPLY)-6.outputs[0] to MathNode(MULTIPLY)-7.inputs[0]
+link ValueNode(float 3.14159)-2.outputs[0] to MathNode(MULTIPLY)-7.inputs[1]
+link MathNode(ADD)-4.outputs[0] to MathNode(MULTIPLY)-6.inputs[0]
+link ValueNode(int 2)-5.outputs[0] to MathNode(MULTIPLY)-6.inputs[1]
+link GroupInput-0.outputs[NodeSocketFloat t] to MathNode(ADD)-4.inputs[0]
+link GroupInput-0.outputs[NodeSocketFloat phase] to MathNode(ADD)-4.inputs[1]

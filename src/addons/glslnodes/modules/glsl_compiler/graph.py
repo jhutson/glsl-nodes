@@ -13,6 +13,9 @@ class Socket:
     name: str
     socket_type: str
 
+    def __str__(self):
+        return f"{self.socket_type} {self.name}"
+
 
 @dataclass(eq=False)
 class Node:
@@ -29,6 +32,9 @@ class GroupNode(Node):
     def input_count(self):
         return len(self.inputs)
 
+    def __str__(self):
+        return "GroupInput" if self.outputs else "GroupOutput"
+
 
 @dataclass(eq=False)
 class ValueNode(Node):
@@ -37,6 +43,8 @@ class ValueNode(Node):
     def input_count(self):
         return 1
 
+    def __str__(self):
+        return f"ValueNode({type(self.value).__name__} {self.value})"
 
 @dataclass(eq=False)
 class MathNode(Node):
@@ -46,6 +54,8 @@ class MathNode(Node):
     def input_count(self):
         return self._input_count
 
+    def __str__(self):
+        return f"MathNode({self.operation})"
 
 @dataclass(frozen=True)
 class SocketRef:
