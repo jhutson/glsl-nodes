@@ -6,7 +6,7 @@ import pytest
 from pathlib import Path
 
 from glsl_compiler import builder, graph, parser
-from tests.visitor import Printer
+from .visitor import Printer
 
 
 def _script_folder():
