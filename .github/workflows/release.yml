@@ -1,0 +1,27 @@
+name: Add-on Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+env:
+  ZIP_FILE_NAME: glsl-nodes.zip
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Zip add-on source
+        run: |
+          pushd src/addons
+          zip -D -r ../../${{ env.ZIP_FILE_NAME }} . -x **/glsl_compiler.egg-info/** **/__pycache__/**
+          popd
+
+      - name: Create release with add-on zip file
+        run: |
+          gh release create ${{ github.ref_name }} --prerelease --generate-notes ./${{ env.ZIP_FILE_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
