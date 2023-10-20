@@ -162,3 +162,6 @@ cython_debug/
 .DS_Store
 
 build/
+
+# Exclude zipped addon folder
+glsl-nodes.zip
