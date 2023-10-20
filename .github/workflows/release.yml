@@ -8,6 +8,9 @@ on:
 env:
   ZIP_FILE_NAME: glsl-nodes.zip
 
+permissions:
+  contents: write
+
 jobs:
   create-release:
     runs-on: ubuntu-latest
